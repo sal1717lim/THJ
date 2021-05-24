@@ -35,7 +35,8 @@ def forme_normal(nb_joueur=2,nb_strategie=3):
 #Strictement dominante
 def sd(FN,joueur=0,strategie=3):
   var=FN.copy()
-  for strat in FN:
+  for indice in range(len(FN)):
+    strat=FN[indice]
     var.remove(strat)
     i=0
     dominante=True
@@ -49,10 +50,10 @@ def sd(FN,joueur=0,strategie=3):
         j=j+1
       i=i+1
     if dominante:
-      return strat
+      return indice
   return None
   
-
+print(sd(forme_normal()))
 
 #Faiblement dominé
 def fd(FN,joueur=0):

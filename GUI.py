@@ -20,10 +20,13 @@ class player1v1(QWidget):
         self.table=QTableWidget()
         self.table.setRowCount(strategie)
         self.table.setColumnCount(strategie)
-        self.layout.addWidget(self.table,0,0,5,1)
+        self.layout.addWidget(self.table,0,0,2,1)
         self.aleatoire=QPushButton("Remplir aleatoirment")
         self.aleatoire.clicked.connect(self.remplirAleatoire)
+        self.sd=QPushButton("SD")
+        self.sd.clicked.connect(self.SD)
         self.layout.addWidget(self.aleatoire,0,1)
+        self.layout.addWidget(self.sd, 1, 1)
         self.strategie=strategie
         self.FN=function.creer_taille(2,strategie)
         self.table.adjustSize()
@@ -32,6 +35,22 @@ class player1v1(QWidget):
         for i in range(self.table.rowCount()):
             for j in range(self.table.columnCount()):
                 self.table.setItem(i,j,QTableWidgetItem(str(self.FN[i][j])))
+    def SD(self):
+        l=self.FN.copy()
+        if(len(l[0][0])!=0):
+            x=function.sd(l,joueur=0,strategie=self.strategie)
+            if(x!=None):
+                for ligne in range(len(l[x])):
+                    self.table.item(x,ligne).setBackground(Qt.red)
+            y=function.sd([list(i) for i in zip(*l)],joueur=1,strategie=self.strategie)
+            if(y!=None):
+                for Colonne in range(len(l[y])):
+                    self.table.item(Colonne,y).setBackground(Qt.blue)
+            if(x!=None and y!=None):
+                self.table.item(x, y).setBackground(Qt.green)
+
+
+
 
 
 class Mainwindow(QWidget):
@@ -39,7 +58,7 @@ class Mainwindow(QWidget):
         super().__init__()
         self.layout=QStackedLayout()
         self.setLayout(self.layout)
-        self.principale=player1v1(3)
+        self.principale=player1v1(2)
 
         self.layout.addWidget(self.principale)
         self.setFixedSize(600, 600)
