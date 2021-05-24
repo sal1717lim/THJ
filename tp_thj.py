@@ -30,8 +30,7 @@ def forme_normal(nb_joueur=2,nb_strategie=3):
     for j in range(taille[1]):
       FN[i][j]=randtup(nb_joueur=nb_joueur)
   return FN
-FN=forme_normal(2,3)
-FN
+
 
 #Strictement dominante
 def sd(FN,joueur=0,strategie=3):
@@ -53,9 +52,7 @@ def sd(FN,joueur=0,strategie=3):
       return strat
   return None
   
- 
-print(sd(FN,0,3))
-print(sd([list(i) for i in zip(*FN)],1,3))
+
 
 #Faiblement dominé
 def fd(FN,joueur=0):
@@ -82,10 +79,8 @@ def fd(FN,joueur=0):
       i=i+1
     
   return FD
-print(fd(FN,0))
-print(fd([list(i) for i in zip(*FN)],1))
 
-exemple=[[(-1,-1),(-10,0)],[(0,-10),(-5,-5)]]
+
 def ES(FN):
   if len(fd(FN,0))!=0:
     FN.remove(fd(FN,0)[0][1])
@@ -98,9 +93,3 @@ def ES(FN):
       ES(FN)
 
   return FN
-
-ES(exemple)
-
-FN=forme_normal(2,2)
-print(FN)
-ES(FN)
