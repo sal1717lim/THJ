@@ -8,7 +8,7 @@ Original file is located at
 """
 
 import numpy as np
- 
+stack =[]
 def creer_taille(nb_joueur=2,nb_strategie=3):
   taille=()
   for i in range(nb_joueur):
@@ -53,7 +53,7 @@ def sd(FN,joueur=0,strategie=3):
       return indice
   return None
   
-print(sd(forme_normal()))
+
 
 #Faiblement dominé
 def fd(FN,joueur=0):
@@ -83,14 +83,23 @@ def fd(FN,joueur=0):
 
 
 def ES(FN):
+  global stack
   if len(fd(FN,0))!=0:
+    t=[]
+    t.append(fd(FN,0)[0][1].copy())
     FN.remove(fd(FN,0)[0][1])
+    t.append(FN.copy())
+    stack.append(t)
     ES(FN)
   
-  if len(fd([list(i) for i in zip(*FN)],))!=0:
+  if len(fd([list(i) for i in zip(*FN)],1))!=0:
+      t = []
       FN=[list(i) for i in zip(*FN)]
+      t.append(fd(FN, 1)[0][1].copy())
       FN.remove(fd(FN,1)[0][1])
       FN=[list(i) for i in zip(*FN)]
+      t.append(FN.copy())
+      stack.append(t)
       ES(FN)
 
   return FN
