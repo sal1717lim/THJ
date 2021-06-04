@@ -102,6 +102,14 @@ def SDtest(FN, numjoueur=1, nbstrat=2):
 
 
 
+def tri_par_joueur(FN,numjoueur,nbstrat):
+    x=[]
+    for i in range(nbstrat):
+        for j in FN:
+           if(j[0][numjoueur]==i):
+               x.append(j)
+    return x
+
 def FDtest(FN, numjoueur=1, nbstrat=2):
     FD = []
     for j in range(nbstrat):
@@ -135,18 +143,30 @@ def FDtest(FN, numjoueur=1, nbstrat=2):
 
 
 
-
-def ES(FN, nb_joueur, nbstrat):
+ESList=[]
+FN=anintiri.copy()
+def ES( nb_joueur, nbstrat):
+    global ESList
+    global FN
     # on lance FD pour chaque joueur et on delete les strategie faible dominé
     for i in range(1, nb_joueur + 1):
+        FN=tri_par_joueur(FN,i,nbstrat)
         if len(FDtest(FN, numjoueur=i, nbstrat=nbstrat)) != 0:
+            x=FDtest(FN, numjoueur=i, nbstrat=nbstrat)
+            for j in range(0,len(x)):
+                v = []
+                cpt=0;
+                for k in range(0,int(len(x[j][0]))):
+                    v.append(x[j][1][k].copy())
+                    FN.remove(x[j][1][k])
+                print("dominante",x[j][0])
+                print("dominé",v)
+                ESList.append([i,v,FN.copy()])
+                break
 
-            for j in FDtest(FN, numjoueur=i, nbstrat=nbstrat):
 
-                for k in j[1]:
-                    FN.remove(k)
             # appel recursif jusque a la fin du parcour
-            ES(FN, nb_joueur, nbstrat)
+            ES( nb_joueur, nbstrat)
 
     return FN
 
@@ -159,7 +179,8 @@ dilemeP = [
     [{2: 1, 1: 0}, (-10, 0)],
     [{2: 1, 1: 1}, (-5, -5)]
 ]
-
-print(SDtest(dilemeP, 1))
-print(SDtest(dilemeP, 2))
-print(ES(dilemeP, 2, 2))
+x=arbre(nbstrat=2).parcour_cible({})
+FN=anintiri.copy()
+for i in FN:
+    print(i)
+print(ES(3,2))
