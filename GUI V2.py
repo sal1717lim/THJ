@@ -1,7 +1,7 @@
 import tp_thj as function
 from PyQt5.QtWidgets import QFrame,QMainWindow,QApplication, QWidget ,QPushButton ,QLabel ,QDial,QLCDNumber,QProgressBar,QComboBox
 from PyQt5.QtWidgets import QGridLayout,QHBoxLayout,QVBoxLayout,QScrollArea,QStackedLayout,QScrollBar,QTableWidget,QTableWidgetItem
-from PyQt5.QtGui import QPixmap,QImage,QFont,QIcon,QFontDatabase
+from PyQt5.QtGui import QPixmap,QImage,QFont,QIcon,QFontDatabase,QPainter,QColor
 from PyQt5.QtCore import Qt,QSize
 import sys
 class onevsone(QWidget):
@@ -9,9 +9,7 @@ class onevsone(QWidget):
         super().__init__()
         self.font=QFontDatabase()
         self.font.addApplicationFont("FrederickatheGreat-Regular.ttf")
-        print(self.font.families())
-
-        self.nbs=2
+        self.nbs=4
         self.layout=QGridLayout()
         self.setLayout(self.layout)
         #le bouton retour
@@ -40,7 +38,6 @@ class onevsone(QWidget):
         self.stack.setLayout(self.layoutstack)
         self.scrollaout.addWidget(self.stack,0,0)
         self.pointeur=0
-
         #le tableau
         self.liststack.append(QWidget())
         grid=QGridLayout()
@@ -51,11 +48,9 @@ class onevsone(QWidget):
         for i in range(self.nbs):
             self.table.setColumnWidth(i,150)
             self.table.setRowHeight(i,80)
-
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
         self.table.setFrameShape(QFrame.NoFrame)
-
         self.table.setStyleSheet("""color:#fffff8;
                                     font-size: 16pt;
                                     border-bottom: 1px solid #fffff8;
@@ -69,30 +64,35 @@ class onevsone(QWidget):
         for i in self.liststack:
             self.layoutstack.addWidget(i)
         #aleatoire
-        self.aleatoire=QPushButton("")
-        aleatoire=QPixmap("aleatoire.png")
-        self.aleatoire.setIcon(QIcon(aleatoire))
+        self.aleatoire=QPushButton("génération aléatoire")
+        self.aleatoire.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.aleatoire.setStyleSheet("color:white;")
+
         self.aleatoire.setIconSize(QSize(220,100))
         self.aleatoire.setFocusPolicy(Qt.NoFocus)
         self.aleatoire.setFlat(True)
         self.layout.addWidget(self.aleatoire,0,7)
         self.aleatoire.clicked.connect(self.generation_aleatoire)
         #Strictement-Dominante
-        self.SD=QPushButton("")
-        self.SD.setIcon(QIcon(QPixmap("strictementd.png")))
+        self.SD=QPushButton("strategie strictement \ndominante")
+
+        self.SD.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.SD.setStyleSheet("color:white;")
         self.SD.setIconSize(QSize(220,100))
         self.SD.setFlat(True)
         self.layout.addWidget(self.SD,1,7)
         self.SD.clicked.connect(self.lancer_SD)
         #ES
-        self.ES = QPushButton("")
-        self.ES.setIcon(QIcon(QPixmap("successive.png")))
+        self.ES = QPushButton("élimination successive")
+        self.ES.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.ES.setStyleSheet("color:white;")
         self.ES.setIconSize(QSize(220, 100))
         self.ES.setFlat(True)
         self.layout.addWidget(self.ES, 2,7 )
         self.ES.clicked.connect(self.runES)
         #droite
         self.droite=QPushButton("")
+
         self.droite.setIcon(QIcon(QPixmap("droite.png")))
         self.droite.setIconSize(QSize(220,100))
         self.layout.addWidget(self.droite,7,3,1,2)
@@ -111,6 +111,35 @@ class onevsone(QWidget):
         self.gauche.setFlat(True)
         self.show()
         self.gauche.clicked.connect(self.goGauche)
+        #Nash
+        self.nash=QPushButton("équilibre de nash\n en strategie pure")
+        self.nash.setIconSize(QSize(220,100))
+        self.layout.addWidget(self.nash,3,7)
+        self.nash.show()
+        self.nash.setFlat(True)
+        self.nash.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.nash.setStyleSheet("color:white;")
+        self.nash.clicked.connect(self.runNash)
+        #pareto
+        self.pareto = QPushButton("Optimum de pareto")
+        self.pareto.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.pareto, 4, 7)
+        self.pareto.show()
+        self.pareto.setFlat(True)
+        self.pareto.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.pareto.setStyleSheet("color:white;")
+        self.pareto.clicked.connect(self.runPareto)
+        # pareto
+        self.securite = QPushButton("niveau de securite")
+        self.securite.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.securite, 5, 7)
+        self.securite.show()
+        self.securite.setFlat(True)
+        self.securite.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.securite.setStyleSheet("color:white;")
+        self.securite.clicked.connect(self.runSecurite)
+
+
     def goGauche(self):
         print(self.pointeur)
         if (self.pointeur > 0 ):
@@ -182,13 +211,6 @@ class onevsone(QWidget):
             self.resultat.setText(self.textres)
             self.resultat.setStyleSheet("color:white;")
             self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
-
-
-
-
-
-
-
     def generation_aleatoire(self):
         self.layoutstack.setCurrentWidget(self.liststack[0])
         self.pointeur=0
@@ -249,6 +271,45 @@ class onevsone(QWidget):
                     self.resultat.setText(self.textres)
                     self.resultat.setStyleSheet("color:white;")
                     self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0],22))
+    def runNash(self):
+        resultat=function.NASH(function.anintiri,2,2,self.nbs)
+        print("equilibre de nash",resultat)
+        if len(resultat)!=0:
+            self.textres = "les équilibres de nash"
+            self.resultat.setText(self.textres)
+            self.resultat.setStyleSheet("color:white;")
+            self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+            for i in resultat:
+                self.table.item(i[0][1], i[0][2]).setBackground(Qt.red)
+                print("done")
+        else:
+            self.textres = "pas d'equilibre de nash en pure"
+            self.resultat.setText(self.textres)
+            self.resultat.setStyleSheet("color:white;")
+            self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+    def runPareto(self):
+        resultat=function.pareto(function.anintiri)
+        print("pareto", resultat)
+        if len(resultat) != 0:
+            self.textres = "les Optimum de pareto"
+            self.resultat.setText(self.textres)
+            self.resultat.setStyleSheet("color:white;")
+            self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+            for i in resultat:
+                self.table.item(i[0][1], i[0][2]).setBackground(Qt.blue)
+                print("done")
+        else:
+            self.textres = "pas d'optimum de pareto"
+            self.resultat.setText(self.textres)
+            self.resultat.setStyleSheet("color:white;")
+            self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+    def runSecurite(self):
+        resultat=function.securite(function.anintiri,2,self.nbs)
+        self.textres = "le niveau de securite du joueur 1 est: "+str(resultat[1])+"\nle niveau de securite du joueur 2 est: "+str(resultat[2])
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+
 
 class Principale(QWidget):
     def __init__(self):
@@ -270,14 +331,12 @@ class Principale(QWidget):
         self.deuxj.setFlat(True)
         self.deuxj.setStyleSheet("color:white;")
         self.deuxj.setFont(QFont(self.font.applicationFontFamilies(0)[0],40))
-
         self.principalelayoyt.addWidget(self.deuxj,4,1)
         self.principalelayoyt.addWidget(QWidget(),0,0,1,3)
         self.nj = QPushButton("N joueurs")
         self.nj.setFlat(True)
         self.nj.setStyleSheet("color:white;")
         self.nj.setFont(QFont(self.font.applicationFontFamilies(0)[0], 40))
-
         self.principalelayoyt.addWidget(self.nj, 5, 1)
         self.par=QLabel("par:-AISSI MOHAMED SALIM\n     -CHIBOUB ABDERRAOUF")
         self.par.setStyleSheet("color:white;")
@@ -289,6 +348,13 @@ class Principale(QWidget):
         self.layout.addWidget(self.menu2j)
         self.deuxj.clicked.connect(self.aller2j)
         self.menu2j.retour.clicked.connect(self.retourprinc)
+        #nj
+        self.menuNj=nplayer()
+        self.layout.addWidget(self.menuNj)
+        self.nj.clicked.connect(self.allerNJ)
+        self.menuNj.retour.clicked.connect(self.retourprinc)
+    def allerNJ(self):
+        self.layout.setCurrentWidget(self.menuNj)
     def aller2j(self):
         self.layout.setCurrentWidget(self.menu2j)
     def retourprinc(self):
@@ -303,6 +369,92 @@ class WINDOW(QMainWindow):
 background-image: url(background3.jpg) ;
 """)
         self.showMaximized()
+class nplayer(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.font = QFontDatabase()
+        self.font.addApplicationFont("FrederickatheGreat-Regular.ttf")
+        self.nbs=2
+        self.nbj=2
+        self.layout=QGridLayout()
+        self.setLayout(self.layout)
+        #retour
+        self.retour=QPushButton("")
+        self.retour.setIcon(QIcon(QPixmap("back.png")))
+        self.retour.setIconSize(QSize(80,80))
+        self.retour.setFlat(True)
+        self.layout.addWidget(self.retour, 0, 0, 1, 1)
+        #stack
+        self.textres = ""
+        self.resultat = QLabel(self.textres)
+        self.scrol = QScrollArea()
+        self.scrol.setFrameShape(QFrame.NoFrame)
+        self.layout.addWidget(self.scrol, 0, 1, 7, 4)
+        self.paneau = QWidget()
+        self.scrol.setWidget(self.paneau)
+        self.scrollaout = QGridLayout()
+        self.paneau.setLayout(self.scrollaout)
+        self.scrol.setWidgetResizable(True)
+        self.stack = QWidget()
+        self.liststack = []
+        self.listimage=[]
+        self.layoutstack = QStackedLayout()
+        self.stack.setLayout(self.layoutstack)
+        self.scrollaout.addWidget(self.stack, 0, 0)
+        self.pointeur = 0
+        #aleatoire
+        self.aleatoire=QPushButton("")
+        self.aleatoire.setIcon(QIcon(QPixmap("aleatoire.png")))
+        self.aleatoire.setIconSize(QSize(220, 100))
+        self.aleatoire.setFocusPolicy(Qt.NoFocus)
+        self.aleatoire.setFlat(True)
+        self.layout.addWidget(self.aleatoire, 0, 7)
+        self.aleatoire.clicked.connect(self.generation_aleatoire)
+        self.arbre=None
+    def generation_aleatoire(self):
+        for i in self.liststack:
+            self.layoutstack.removeWidget(i)
+            self.liststack.remove(i)
+        image=QImage(QSize(500,500),QImage.Format_RGB888)
+
+        label=QLabel("")
+        self.listimage.append(image)
+        label.setPixmap(QPixmap.fromImage(image))
+        self.liststack.append(label)
+        self.layoutstack.addWidget(label)
+        self.arbre=function.arbre(self.nbs,self.nbj,self.nbj)
+        self.arbre.parcour_cible({})
+        image = self.listimage[-1]
+        painter = QPainter(image)
+        x = self.arbre
+
+        self.dessiner_arbre(x,image,painter,position=[100,30],numjoueur=1)
+        label = self.liststack[-1]
+        label.setPixmap(QPixmap.fromImage(self.listimage[-1]))
+
+
+    def dessiner_arbre(self,x,image,painter,position=[50,50],numjoueur=1):
+
+
+        painter.setPen(QColor(255,0, 0))
+        painter.drawEllipse(position[0],position[1],50,50)
+        print(position)
+        if isinstance(x.suivant,list):
+
+            for i in range(0,len(self.arbre.suivant)):
+
+                painter.drawLine(position[0]+25, position[1] + 50, position[0]+i*100+25, position[1] + 70)
+                label = self.liststack[-1]
+                label.setPixmap(QPixmap.fromImage(image))
+                self.arbre=x.suivant[i]
+                self.listimage.append(image)
+                self.dessiner_arbre(self.arbre,image,painter,[position[0]+i*100,position[1]+70])
+
+
+
+
+
+
 
 if __name__=='__main__':
     app=QApplication(sys.argv)

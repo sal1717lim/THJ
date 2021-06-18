@@ -170,17 +170,80 @@ def ES( nb_joueur, nbstrat):
 
     return FN
 
-
-
-
-dilemeP = [
-    [{2: 0, 1: 0}, (-1, -1)],
-    [{2: 0, 1: 1}, (0, -10)],
-    [{2: 1, 1: 0}, (-10, 0)],
-    [{2: 1, 1: 1}, (-5, -5)]
-]
-x=arbre(nbstrat=2).parcour_cible({})
+x=arbre(nbjoueur=2,joueur=2,nbstrat=3).parcour_cible({})
 FN=anintiri.copy()
-for i in FN:
-    print(i)
-print(ES(3,2))
+
+
+def aranger_le_jeu(FN, numero_joueur=1, nombrejoueur=3, nombre_strat=3):
+    for i in range(1, nombrejoueur + 1):
+        if i != numero_joueur:
+            FN = tri_par_joueur(FN, i, nombre_strat)
+
+    return FN
+
+
+def meilleur_reponse(FN, numero_joueur=1, nombrejoueur=3, nombre_strat=3):
+    FN = aranger_le_jeu(FN, numero_joueur=numero_joueur, nombrejoueur=nombrejoueur, nombre_strat=nombre_strat)
+    meilleur_reponse = []
+    i = 0
+    while i < len(FN):
+        max = None
+        for j in range(nombre_strat):
+            if max == None:
+                max = FN[i + j]
+            else:
+                if FN[i + j][1][numero_joueur - 1] > max[1][numero_joueur - 1]:
+                    max = FN[i + j]
+        meilleur_reponse.append(max)
+        i += nombre_strat
+    return meilleur_reponse
+
+
+def NASH(FN, numero_joueur=1, nombrejoueur=3, nombre_strat=3):
+    Meilleur_reponses = []
+    for i in range(1, nombrejoueur + 1):
+        Meilleur_reponses.append(
+            meilleur_reponse(FN, numero_joueur=i, nombrejoueur=nombrejoueur, nombre_strat=nombre_strat))
+    intersection = [x for x in Meilleur_reponses[0] if x in Meilleur_reponses[1]]
+
+    for i in range(2, len(Meilleur_reponses)):
+        intersection = [x for x in intersection if x in Meilleur_reponses[i]]
+    return intersection
+
+def pareto(FN):
+    var=FN.copy()
+    paretolist=[]
+    for i in var:
+        copy=var.copy()
+        copy.remove(i)
+        par = True
+        for j in copy:
+           for l in range(0, len(i[1])):
+            if j[1][l]>=i[1][l]:
+                for k in range(0,len(i[1])):
+                  if l!=k:
+                    if i[1][k]<j[1][k]:
+                        par=False
+        if par:
+            paretolist.append(i)
+    return paretolist
+
+def securite(FN,nombrejoueur=3,nombre_strat=3):
+    securite= {}
+    for i in range(1,nombrejoueur+1):
+        minimum={}
+
+        for strat in range(nombre_strat):
+            minimum[strat]=None
+            for etat in FN:
+                if etat[0][i]==strat:
+                    if minimum[strat]==None:
+                        minimum[strat]=etat[1][i-1]
+                    else:
+                        if minimum[strat]>etat[1][i-1]:
+                            minimum[strat]=etat[1][i-1]
+        securite[i]=max(minimum.values())
+    return securite
+
+
+print(NASH(FN,2,2,3))
