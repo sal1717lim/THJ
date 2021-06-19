@@ -61,8 +61,7 @@ class arbre:
                 i.parcour_cible()
 
 
-nbj = 4
-nbs = 2
+
 
 
 
@@ -144,7 +143,7 @@ def FDtest(FN, numjoueur=1, nbstrat=2):
 
 
 ESList=[]
-FN=anintiri.copy()
+
 def ES( nb_joueur, nbstrat):
     global ESList
     global FN
@@ -170,8 +169,6 @@ def ES( nb_joueur, nbstrat):
 
     return FN
 
-x=arbre(nbjoueur=2,joueur=2,nbstrat=3).parcour_cible({})
-FN=anintiri.copy()
 
 
 def aranger_le_jeu(FN, numero_joueur=1, nombrejoueur=3, nombre_strat=3):
@@ -246,4 +243,3 @@ def securite(FN,nombrejoueur=3,nombre_strat=3):
     return securite
 
 
-print(NASH(FN,2,2,3))

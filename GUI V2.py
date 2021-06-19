@@ -516,7 +516,7 @@ class nplayer(QWidget):
         self.resultat = QLabel(self.textres)
         self.scrol = QScrollArea()
         self.scrol.setFrameShape(QFrame.NoFrame)
-        self.layout.addWidget(self.scrol, 0, 1, 7, 4)
+        self.layout.addWidget(self.scrol, 1, 1, 7, 4)
         self.paneau = QWidget()
         self.scrol.setWidget(self.paneau)
         self.scrollaout = QGridLayout()
@@ -568,6 +568,96 @@ class nplayer(QWidget):
         self.strat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
         self.strat.setStyleSheet("color:white;")
         self.layout.addWidget(self.strat, 1, 0)
+        # Strictement-Dominante
+        self.SD = QPushButton("strategie strictement \ndominante")
+
+        self.SD.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.SD.setStyleSheet("color:white;")
+        self.SD.setIconSize(QSize(220, 100))
+        self.SD.setFlat(True)
+        self.layout.addWidget(self.SD, 1, 7)
+        self.SD.clicked.connect(self.lancer_SD)
+        # ES
+        self.ES = QPushButton("élimination successive")
+        self.ES.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.ES.setStyleSheet("color:white;")
+        self.ES.setIconSize(QSize(220, 100))
+        self.ES.setFlat(True)
+        self.layout.addWidget(self.ES, 2, 7)
+        self.ES.clicked.connect(self.runES)
+        # Nash
+        self.nash = QPushButton("équilibre de nash\n en strategie pure")
+        self.nash.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.nash, 3, 7)
+        self.nash.show()
+        self.nash.setFlat(True)
+        self.nash.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.nash.setStyleSheet("color:white;")
+        self.nash.clicked.connect(self.runNash)
+        # pareto
+        self.pareto = QPushButton("Optimum de pareto")
+        self.pareto.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.pareto, 4, 7)
+        self.pareto.show()
+        self.pareto.setFlat(True)
+        self.pareto.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.pareto.setStyleSheet("color:white;")
+        self.pareto.clicked.connect(self.runPareto)
+        # securite
+        self.securite = QPushButton("niveau de securite")
+        self.securite.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.securite, 5, 7)
+        self.securite.show()
+        self.securite.setFlat(True)
+        self.securite.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.securite.setStyleSheet("color:white;")
+        self.securite.clicked.connect(self.runSecurite)
+    def lancer_SD(self):
+        sd=[]
+        print(function.anintiri)
+        for i in range(1,self.nbj+1):
+            sd.append(function.SDtest(function.anintiri, numjoueur=i))
+        text=""
+        for i in range(len(sd)):
+            if sd[i]==None:
+                text=text+"le joueur "+str(i)+"n'a pas de strategie strictement dominante\n"
+            else:
+                text=text+"la strategie"+str(sd[i])+"du joueur"+str(i)+"est une strategie strictement dominante"
+        self.textres = text
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.resultat, 0, 1)
+
+
+
+    def runES(self):
+        pass
+    def runNash(self):
+        resultat=function.NASH(function.anintiri,self.nbj,self.nbj,self.nbs)
+        self.textres = "les equilibre de Nash"+str(resultat)
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.resultat, 0, 1)
+    def runPareto(self):
+        resultat=function.pareto(function.anintiri)
+        print(resultat)
+        self.textres = "les optimums de pareto" + str(resultat)
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.resultat, 0, 1)
+    def runSecurite(self):
+        resultat = function.securite(function.anintiri, self.nbj, self.nbs)
+        self.textres=""
+        for i in range(len(resultat)):
+            self.textres = self.textres+"le niveau de securite du joueur " + str(i+1) + " est: " + str(resultat[i+1]) + "\n"
+
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.resultat, 0, 1)
     def changestrat(self):
         self.nbs = int(self.box.currentText())
 
@@ -595,7 +685,7 @@ class nplayer(QWidget):
         self.dessiner_arbre(x,image,painter,numjoueur=1)
         label = self.liststack[-1]
         label.setPixmap(QPixmap.fromImage(self.listimage[-1]))
-
+        print(function.anintiri)
 
     def dessiner_arbre(self,x,image,painter,numjoueur=1):
 
