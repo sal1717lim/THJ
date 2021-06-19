@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QGridLayout,QHBoxLayout,QVBoxLayout,QScrollArea,QSta
 from PyQt5.QtGui import QPixmap,QImage,QFont,QIcon,QFontDatabase,QPainter,QColor
 from PyQt5.QtCore import Qt,QSize
 import sys
+position=[50,50]
 class onevsone(QWidget):
     def __init__(self):
         super().__init__()
@@ -12,6 +13,7 @@ class onevsone(QWidget):
         self.nbs=4
         self.layout=QGridLayout()
         self.setLayout(self.layout)
+
         #le bouton retour
         self.retour=QPushButton()
         self.mapimage=QPixmap("back.png")
@@ -40,8 +42,8 @@ class onevsone(QWidget):
         self.pointeur=0
         #le tableau
         self.liststack.append(QWidget())
-        grid=QGridLayout()
-        self.liststack[-1].setLayout(grid)
+        self.grid=QGridLayout()
+        self.liststack[-1].setLayout(self.grid)
         self.table = QTableWidget()
         self.table.setRowCount(self.nbs)
         self.table.setColumnCount(self.nbs)
@@ -59,8 +61,8 @@ class onevsone(QWidget):
                                     border-left: 1px solid #fffff8;
                                     font-family: Heina’s Hurry;""")
         self.table.setFixedSize(151 *self.nbs,81 * self.nbs)
-        grid.addWidget(self.table,1,1,3,1)
-        grid.addWidget(self.resultat, 0, 0,1,3)
+        self.grid.addWidget(self.table,1,1,3,1)
+        self.grid.addWidget(self.resultat, 0, 0,1,3)
         for i in self.liststack:
             self.layoutstack.addWidget(i)
         #aleatoire
@@ -129,7 +131,7 @@ class onevsone(QWidget):
         self.pareto.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
         self.pareto.setStyleSheet("color:white;")
         self.pareto.clicked.connect(self.runPareto)
-        # pareto
+        # securite
         self.securite = QPushButton("niveau de securite")
         self.securite.setIconSize(QSize(220, 100))
         self.layout.addWidget(self.securite, 5, 7)
@@ -138,8 +140,116 @@ class onevsone(QWidget):
         self.securite.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
         self.securite.setStyleSheet("color:white;")
         self.securite.clicked.connect(self.runSecurite)
-
-
+        #dilemme du prisonier
+        self.prisonier = QPushButton("Le dilemme du prisonnier")
+        self.prisonier.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.prisonier, 6, 7)
+        self.prisonier.show()
+        self.prisonier.setFlat(True)
+        self.prisonier.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.prisonier.setStyleSheet("color:white;")
+        self.prisonier.clicked.connect(self.runprisonier)
+        #jeux de la tirelire
+        self.tirelire= QPushButton("jeu de la tirelire")
+        self.tirelire.setIconSize(QSize(220, 100))
+        self.layout.addWidget(self.tirelire, 7, 7)
+        self.tirelire.show()
+        self.tirelire.setFlat(True)
+        self.tirelire.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+        self.tirelire.setStyleSheet("color:white;")
+        self.tirelire.clicked.connect(self.runtirelire)
+        #box
+        self.box = QComboBox()
+        for i in range(2, 20):
+            self.box.addItem(str(i))
+        self.box.setCurrentIndex(1)
+        self.box.currentTextChanged.connect(self.changestrat)
+        self.box.setWindowOpacity(0.5)
+        self.box.setStyleSheet("color:blue;")
+        self.box.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.box, 2,0)
+        #text nombre de strat
+        self.strat=QLabel("nombre de strategie")
+        self.strat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
+        self.strat.setStyleSheet("color:white;")
+        self.layout.addWidget(self.strat, 1, 0)
+    def runtirelire(self):
+        self.textres = """Le jeu suivant est proposé à deux étudiants choisis au hasard : chacun à la possibilité de
+mettre 0 ou 100 dinars dans une tirelire. Après que chaque étudiant ait pris sa décision
+sans connaitre la décision de l’autre, le contenu de la tirelire sera multipliée par 1.5 et
+partagé à parts égales entre les deux étudiants."""
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
+        self.table.setRowCount(2)
+        self.table.setColumnCount(2)
+        for i in range(2):
+            self.table.setColumnWidth(i, 150)
+            self.table.setRowHeight(i, 80)
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setStyleSheet("""color:#fffff8;
+                                                    font-size: 16pt;
+                                                    border-bottom: 1px solid #fffff8;
+                                                    border-right: 1px solid #fffff8;    
+                                                    border-top: 1px solid #fffff8; 
+                                                    border-left: 1px solid #fffff8;
+                                                    font-family: Heina’s Hurry;""")
+        self.table.setFixedSize(151 * 2, 81 * 2)
+        self.grid.addWidget(self.table, 1, 1, 3, 1)
+        self.grid.addWidget(self.resultat, 0, 0, 1, 3)
+        function.anintiri = [
+            [{2: 0, 1: 0}, (0, 0)],
+            [{2: 0, 1: 1}, (75, -25)],
+            [{2: 1, 1: 0}, (-25, 75)],
+            [{2: 1, 1: 1}, (50, 50)]
+        ]
+        self.nbs = 2
+        for i in function.anintiri:
+            print(i)
+            self.table.setItem(i[0][1], i[0][2], QTableWidgetItem(str(i[1])))
+            self.table.item(i[0][1], i[0][2]).setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+    def changestrat(self):
+        self.nbs=int(self.box.currentText())
+    def runprisonier(self):
+        self.textres = """L'exemple phare est le problème du dilemme du prisonnier :\n
+Sur un braquage à main armé, deux suspects sont arrêtés par\nla police, qui ont alors deux choix : ils peuvent choisir de se taire ou alors,\ndénoncer leur camarade de jeu.
+* Si les deux suspects se dénoncent l'un l'autre, chacun en prendra \npour 5 ans de prison
+* Si l'un dénonce et que l'autre se tait, celui qui se tait aura \n10 ans de prison, et l'autre sera relâché
+* Si les deux choisissent de se taire, dans le doute, les deux auront 1 an de prison"""
+        self.resultat.setText(self.textres)
+        self.resultat.setStyleSheet("color:white;")
+        self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
+        self.table.setRowCount(2)
+        self.table.setColumnCount(2)
+        for i in range(2):
+            self.table.setColumnWidth(i, 150)
+            self.table.setRowHeight(i, 80)
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setStyleSheet("""color:#fffff8;
+                                            font-size: 16pt;
+                                            border-bottom: 1px solid #fffff8;
+                                            border-right: 1px solid #fffff8;    
+                                            border-top: 1px solid #fffff8; 
+                                            border-left: 1px solid #fffff8;
+                                            font-family: Heina’s Hurry;""")
+        self.table.setFixedSize(151 * 2, 81 * 2)
+        self.grid.addWidget(self.table, 1, 1, 3, 1)
+        self.grid.addWidget(self.resultat, 0, 0, 1, 3)
+        function.anintiri = [
+            [{2: 0, 1: 0}, (-1, -1)],
+            [{2: 0, 1: 1}, (0, -10)],
+            [{2: 1, 1: 0}, (-10, 0)],
+            [{2: 1, 1: 1}, (-5, -5)]
+        ]
+        self.nbs=2
+        for i in function.anintiri:
+            print(i)
+            self.table.setItem(i[0][1],i[0][2],QTableWidgetItem(str(i[1])))
+            self.table.item(i[0][1], i[0][2]).setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
     def goGauche(self):
         print(self.pointeur)
         if (self.pointeur > 0 ):
@@ -209,10 +319,29 @@ class onevsone(QWidget):
         else:
             self.textres = "elimination successive impossible"
             self.resultat.setText(self.textres)
-            self.resultat.setStyleSheet("color:white;")
+            self.resultat.setStyleSheet("color:whitebackground-color: yellow;")
             self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
     def generation_aleatoire(self):
+        self.nbs= int(self.box.currentText())
         self.layoutstack.setCurrentWidget(self.liststack[0])
+        self.table.setRowCount(self.nbs)
+        self.table.setColumnCount(self.nbs)
+        for i in range(self.nbs):
+            self.table.setColumnWidth(i, 150)
+            self.table.setRowHeight(i, 80)
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setStyleSheet("""color:#fffff8;
+                                                  font-size: 16pt;
+                                                  border-bottom: 1px solid #fffff8;
+                                                  border-right: 1px solid #fffff8;    
+                                                  border-top: 1px solid #fffff8; 
+                                                  border-left: 1px solid #fffff8;
+                                                  font-family: Heina’s Hurry;""")
+        self.table.setFixedSize(151 * self.nbs, 81 * self.nbs)
+        self.grid.addWidget(self.table, 1, 1, 3, 1)
+        self.grid.addWidget(self.resultat, 0, 0, 1, 3)
         self.pointeur=0
         for i in range(len(self.liststack)-1,0,-1):
             self.layoutstack.removeWidget(self.liststack[i])
@@ -309,8 +438,6 @@ class onevsone(QWidget):
         self.resultat.setText(self.textres)
         self.resultat.setStyleSheet("color:white;")
         self.resultat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
-
-
 class Principale(QWidget):
     def __init__(self):
         super().__init__()
@@ -374,8 +501,8 @@ class nplayer(QWidget):
         super().__init__()
         self.font = QFontDatabase()
         self.font.addApplicationFont("FrederickatheGreat-Regular.ttf")
-        self.nbs=2
-        self.nbj=2
+        self.nbs=3
+        self.nbj=3
         self.layout=QGridLayout()
         self.setLayout(self.layout)
         #retour
@@ -411,12 +538,48 @@ class nplayer(QWidget):
         self.layout.addWidget(self.aleatoire, 0, 7)
         self.aleatoire.clicked.connect(self.generation_aleatoire)
         self.arbre=None
+        # box
+        self.box2 = QComboBox()
+        for i in range(2, 20):
+            self.box2.addItem(str(i))
+        self.box2.setCurrentIndex(1)
+        self.box2.currentTextChanged.connect(self.changej)
+        self.box2.setWindowOpacity(0.5)
+        self.box2.setStyleSheet("color:blue;")
+        self.box2.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.box2, 4, 0)
+        # text nombre de strat
+        self.j = QLabel("nombre de joeur")
+        self.j.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
+        self.j.setStyleSheet("color:white;")
+        self.layout.addWidget(self.j, 3, 0)
+        # box
+        self.box = QComboBox()
+        for i in range(2, 20):
+            self.box.addItem(str(i))
+        self.box.setCurrentIndex(1)
+        self.box.currentTextChanged.connect(self.changestrat)
+        self.box.setWindowOpacity(0.5)
+        self.box.setStyleSheet("color:blue;")
+        self.box.setFont(QFont(self.font.applicationFontFamilies(0)[0], 25))
+        self.layout.addWidget(self.box, 2, 0)
+        # text nombre de strat
+        self.strat = QLabel("nombre de strategie")
+        self.strat.setFont(QFont(self.font.applicationFontFamilies(0)[0], 20))
+        self.strat.setStyleSheet("color:white;")
+        self.layout.addWidget(self.strat, 1, 0)
+    def changestrat(self):
+        self.nbs = int(self.box.currentText())
+
+    def changej(self):
+        self.nbj= int(self.box2.currentText())
     def generation_aleatoire(self):
+        global position
         for i in self.liststack:
             self.layoutstack.removeWidget(i)
             self.liststack.remove(i)
-        image=QImage(QSize(500,500),QImage.Format_RGB888)
-
+        image=QImage(QSize(2*(self.nbs+self.nbj)*500,(self.nbs+self.nbj)*500),QImage.Format_RGB888)
+        image.fill(Qt.black)
         label=QLabel("")
         self.listimage.append(image)
         label.setPixmap(QPixmap.fromImage(image))
@@ -428,36 +591,46 @@ class nplayer(QWidget):
         painter = QPainter(image)
         x = self.arbre
 
-        self.dessiner_arbre(x,image,painter,position=[100,30],numjoueur=1)
+        position = [250, 0]
+        self.dessiner_arbre(x,image,painter,numjoueur=1)
         label = self.liststack[-1]
         label.setPixmap(QPixmap.fromImage(self.listimage[-1]))
 
 
-    def dessiner_arbre(self,x,image,painter,position=[50,50],numjoueur=1):
+    def dessiner_arbre(self,x,image,painter,numjoueur=1):
 
-
-        painter.setPen(QColor(255,0, 0))
-        painter.drawEllipse(position[0],position[1],50,50)
+        global position
+        painter.setPen(QColor(255,255, 255))
+        if not self.arbre.racine:
+         painter.drawEllipse(position[0],position[1],50,50)
+        xx=position[0]+25
+        yy=position[1]+50
         print(position)
+
         if isinstance(x.suivant,list):
 
             for i in range(0,len(self.arbre.suivant)):
 
-                painter.drawLine(position[0]+25, position[1] + 50, position[0]+i*100+25, position[1] + 70)
+                if not self.arbre.racine:
+                    painter.drawLine(xx, yy, position[0]-25, position[1] +55)
+                    painter.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+                    painter.drawText(position[0] - 50 + 25, position[1] + 55 + 25, str(i+1))
                 label = self.liststack[-1]
                 label.setPixmap(QPixmap.fromImage(image))
                 self.arbre=x.suivant[i]
                 self.listimage.append(image)
-                self.dessiner_arbre(self.arbre,image,painter,[position[0]+i*100,position[1]+70])
 
+                position[1]=position[1]+55
 
+                position[0] = position[0] - 50
 
+                self.dessiner_arbre(self.arbre,image,painter)
+        else:
+            painter.setFont(QFont(self.font.applicationFontFamilies(0)[0], 16))
+            painter.drawText(position[0]+10,position[1]+70,str(x.suivant))
 
-
-
-
+            position[0] = position[0] +200
 if __name__=='__main__':
     app=QApplication(sys.argv)
     ex = WINDOW()
     sys.exit(app.exec_())
-
